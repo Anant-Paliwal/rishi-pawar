@@ -306,7 +306,7 @@ def serve_pdf(pdf_name):
         return send_file(pdf_path, mimetype='application/pdf')
     else:
         return "PDF not found", 404
-
-# Run the Flask app
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
+
