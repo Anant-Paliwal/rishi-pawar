@@ -4,180 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Summaries</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+            --sidebar-width: 300px;
+            --border-radius: 10px;
+        }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Arial', sans-serif;
             line-height: 1.6;
-            color: #333;
-            background-color: #f4f7f9;
+            color: var(--text-color);
             margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            display: grid;
+            grid-template-columns: minmax(200px, 300px) 1fr;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .sidebar {
+            background-color: var(--secondary-color);
             padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .main-content {
+            padding: 20px;
+            overflow-y: auto;
         }
 
         h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.5em;
+            margin: 0;
+            font-size: 24px;
         }
 
-        a {
+        #pdf-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        #pdf-list li {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        #pdf-list li:hover {
+            transform: translateX(5px);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #pdf-list a {
+            color: #fff;
             text-decoration: none;
-            color: #3498db;
-            transition: color 0.3s ease;
+            font-weight: bold;
+            display: block;
+            padding: 10px 15px;
         }
 
-        a:hover {
-            color: #2980b9;
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
+        #summary-container {
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .pdf-list {
-            width: 20%;
-            background-color: #ecf0f1;
             padding: 20px;
-            box-sizing: border-box;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .pdf-list h2 {
-            color: #2c3e50;
+        #summary-container h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
             margin-top: 0;
         }
 
-        .pdf-list ul {
+        #summary-container ul {
             list-style-type: none;
             padding: 0;
         }
 
-        .pdf-list li {
-            margin-bottom: 10px;
-        }
-
-        .pdf-list a {
-            display: block;
-            padding: 8px;
-            background-color: #fff;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        .pdf-list a:hover {
-            background-color: #e0e6e9;
-        }
-
-        .pdf-viewer {
-            width: 40%;
-            height: 600px;
-            border: none;
-        }
-
-        .summary-viewer {
-            width: 35%;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
-
-        .summary-viewer h2 {
-            color: #2c3e50;
-            margin-top: 0;
-        }
-
-        .summary-viewer h3 {
-            color: #34495e;
-        }
-
-        .summary-viewer ul {
-            padding-left: 20px;
-        }
-
-        .summary-viewer li {
+        #summary-container li {
+            background-color: var(--background-color);
             margin-bottom: 5px;
+            padding: 5px 10px;
+            border-radius: calc(var(--border-radius) / 2);
         }
 
-        /* Buttons */
-        .action-links {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+        .error {
+            color: #e74c3c;
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
         }
 
-        .action-links a {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: #fff;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+        .loading {
+            text-align: center;
+            color: var(--secondary-color);
+            font-style: italic;
         }
 
-        .action-links a:hover {
-            background-color: #2980b9;
-        }
-
-        /* Responsive design */
-        @media (max-width: 1024px) {
-            .container {
-                flex-direction: column;
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
             }
-            .pdf-list, .pdf-viewer, .summary-viewer {
-                width: 100%;
-                margin-bottom: 20px;
+
+            .sidebar {
+                grid-row: 2;
+                max-height: 200px;
+            }
+
+            .main-content {
+                grid-row: 3;
             }
         }
     </style>
 </head>
 <body>
-    <h1>PDF Summaries</h1>
-    <div class="action-links">
-        <a href="{{ url_for('process_dataset') }}">Process Dataset PDFs</a>
-        <a href="{{ url_for('upload_file') }}">Upload new PDF</a>
-    </div>
-    
-    <div class="container">
-        <div class="pdf-list">
-            <h2>PDFs</h2>
-            <ul>
+    <header class="header">
+        <h1>PDF Summaries</h1>
+    </header>
+    <div class="sidebar">
+        {% if pdfs %}
+            <ul id="pdf-list">
                 {% for pdf in pdfs %}
                     <li>
-                        <a href="#" onclick="loadPdfAndSummary('{{ pdf.original_file }}')">{{ pdf.original_file }}</a>
+                        <a href="#" onclick="showSummary('{{ pdf.original_file }}')">{{ pdf.original_file }}</a>
                     </li>
                 {% endfor %}
             </ul>
-        </div>
-        
-        <iframe id="pdf-viewer" class="pdf-viewer" src="" frameborder="0"></iframe>
-        
-        <div id="summary" class="summary-viewer"></div>
+        {% else %}
+            <p class="error">No PDFs found. Please check the database connection.</p>
+        {% endif %}
     </div>
+    <div class="main-content">
+        <div id="summary-container">
+            <p>Select a PDF from the list to view its summary.</p>
+        </div>
+    </div>
+
     <script>
-        function loadPdfAndSummary(pdfName) {
-            // Load PDF
-            document.getElementById('pdf-viewer').src = `/pdf/${pdfName}`;
+        function showSummary(pdfName) {
+            const summaryContainer = document.getElementById('summary-container');
+            summaryContainer.innerHTML = '<p class="loading">Loading summary...</p>';
             
-            // Fetch and display summary
-            fetch(`/summary/${pdfName}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('summary').innerHTML = `
+            axios.get(`/summary/${pdfName}`)
+                .then(response => {
+                    const data = response.data;
+                    summaryContainer.innerHTML = `
                         <h2>Summary for ${pdfName}</h2>
                         <p>${data.summary}</p>
                         <h3>Keywords</h3>
-                        <ul>${data.keywords.map(kw => `<li>${kw}</li>`).join('')}</ul>
+                        <ul>
+                            ${data.keywords.map(keyword => `<li>${keyword}</li>`).join('')}
+                        </ul>
                     `;
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error fetching summary:', error);
+                    summaryContainer.innerHTML = `
+                        <p class="error">Error fetching summary for ${pdfName}: ${error.response ? error.response.data.error : 'Unknown error'}</p>
+                    `;
+                });
         }
     </script>
 </body>
