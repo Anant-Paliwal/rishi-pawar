@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import os
 import logging
 from pymongo.server_api import ServerApi
-
+import requests
 app = Flask(__name__)
 
 # Set up logging
