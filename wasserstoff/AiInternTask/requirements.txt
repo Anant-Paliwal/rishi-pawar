@@ -3,3 +3,4 @@ pymongo
 gunicorn
 requests
 pypdf2
+numpy
