@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Summaries</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        a {
+            text-decoration: none;
+            color: #3498db;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #2980b9;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .pdf-list {
+            width: 20%;
+            background-color: #ecf0f1;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .pdf-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .pdf-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .pdf-list li {
+            margin-bottom: 10px;
+        }
+
+        .pdf-list a {
+            display: block;
+            padding: 8px;
+            background-color: #fff;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .pdf-list a:hover {
+            background-color: #e0e6e9;
+        }
+
+        .pdf-viewer {
+            width: 40%;
+            height: 600px;
+            border: none;
+        }
+
+        .summary-viewer {
+            width: 35%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .summary-viewer h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .summary-viewer h3 {
+            color: #34495e;
+        }
+
+        .summary-viewer ul {
+            padding-left: 20px;
+        }
+
+        .summary-viewer li {
+            margin-bottom: 5px;
+        }
+
+        /* Buttons */
+        .action-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .action-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-links a:hover {
+            background-color: #2980b9;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            .pdf-list, .pdf-viewer, .summary-viewer {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Summaries</h1>
+    <div class="action-links">
+        <a href="{{ url_for('process_dataset') }}">Process Dataset PDFs</a>
+        <a href="{{ url_for('upload_file') }}">Upload new PDF</a>
+    </div>
+    
+    <div class="container">
+        <div class="pdf-list">
+            <h2>PDFs</h2>
+            <ul>
+                {% for pdf in pdfs %}
+                    <li>
+                        <a href="#" onclick="loadPdfAndSummary('{{ pdf.original_file }}')">{{ pdf.original_file }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <iframe id="pdf-viewer" class="pdf-viewer" src="" frameborder="0"></iframe>
+        
+        <div id="summary" class="summary-viewer"></div>
+    </div>
+    <script>
+        function loadPdfAndSummary(pdfName) {
+            // Load PDF
+            document.getElementById('pdf-viewer').src = `/pdf/${pdfName}`;
+            
+            // Fetch and display summary
+            fetch(`/summary/${pdfName}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('summary').innerHTML = `
+                        <h2>Summary for ${pdfName}</h2>
+                        <p>${data.summary}</p>
+                        <h3>Keywords</h3>
+                        <ul>${data.keywords.map(kw => `<li>${kw}</li>`).join('')}</ul>
+                    `;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
