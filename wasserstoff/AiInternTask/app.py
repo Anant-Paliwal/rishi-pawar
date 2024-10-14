@@ -230,13 +230,9 @@ def index():
     """
     Render the main page with a list of all PDFs.
     """
-    try:
         pdfs = list(collection.find({}, {'original_file': 1}))
         app.logger.info(f"Retrieved {len(pdfs)} PDFs from the database")
         return render_template('index.html', pdfs=pdfs)
-    except Exception as e:
-        app.logger.error(f"Error fetching PDFs: {str(e)}")
-        return render_template('error.html', error="Failed to fetch PDFs"), 500
 
 @app.route('/summary/<pdf_name>')
 def get_summary(pdf_name):
