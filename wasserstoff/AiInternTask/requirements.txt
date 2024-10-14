@@ -1,11 +1,10 @@
-Flask==2.3.2
-PyPDF2==3.0.1
-pymongo==4.5.0
-nltk==3.8.1
-tensorflow==2.14.0
-Pillow==10.0.0
-flask_pymongo==2.3.0
+Flask==2.0.1
+requests==2.26.0
+PyPDF2==3.0.0
+numpy==1.23.0
 pdf2image==1.16.3
-pytest==7.4.2  # For testing
-gunicorn==21.2.0  # Optional, for deployment
-keras
+Pillow==8.3.1
+nltk==3.6.3
+tensorflow==2.9.0
+pymongo==4.1.1
+gunicorn==20.1.0
