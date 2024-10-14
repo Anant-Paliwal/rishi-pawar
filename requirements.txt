@@ -1,0 +1,11 @@
+Flask==2.3.2
+PyPDF2==3.0.1
+pymongo==4.5.0
+nltk==3.8.1
+tensorflow==2.14.0
+Pillow==10.0.0
+flask_pymongo==2.3.0
+pdf2image==1.16.3
+mobileNetV3==0.1.0  # If using MobileNetV3 custom library, update this
+pytest==7.4.2  # For testing
+gunicorn==21.2.0  # Optional, for deployment
